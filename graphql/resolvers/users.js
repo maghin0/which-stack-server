@@ -5,7 +5,7 @@ const { UserInputError } = require("apollo-server");
 const {
   validateRegisterInput,
   validateLoginInput
-} = require("../../utilities/validators");
+} = require("../../util/validators");
 const { SECRET_KEY } = require("../../config");
 const User = require("../../models/User");
 
@@ -25,19 +25,24 @@ module.exports = {
   Mutation: {
     async login(_, { username, password }) {
       const { errors, valid } = validateLoginInput(username, password);
+
       if (!valid) {
-        throw new UserInputError("Error", { errors });
+        throw new UserInputError("Errors", { errors });
       }
+
       const user = await User.findOne({ username });
+
       if (!user) {
         errors.general = "The user was not found";
         throw new UserInputError("The user was not found", { errors });
       }
+
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
-        errors.general = "The password or email are wrong";
-        throw new UserInputError("The password or email are wrong", { errors });
+        errors.general = "he password or email are wrong";
+        throw new UserInputError("he password or email are wrong", { errors });
       }
+
       const token = generateToken(user);
 
       return {
@@ -48,13 +53,9 @@ module.exports = {
     },
     async register(
       _,
-      {
-        registerInput: { username, email, password, confirmPassword }
-      },
-      context,
-      info
+      { registerInput: { username, email, password, confirmPassword } }
     ) {
-      // TODO Validate user data
+      // Validate user data
       const { valid, errors } = validateRegisterInput(
         username,
         email,
@@ -64,10 +65,10 @@ module.exports = {
       if (!valid) {
         throw new UserInputError("Errors", { errors });
       }
-      // Make sure user doesn't already exist
+      // TODO: Make sure user doesnt already exist
       const user = await User.findOne({ username });
       if (user) {
-        throw new UserInputError("this username is already taken", {
+        throw new UserInputError("This username is already taken", {
           errors: {
             username: "Please use a different username"
           }
@@ -82,6 +83,7 @@ module.exports = {
         password,
         createdAt: new Date().toISOString()
       });
+
       const res = await newUser.save();
 
       const token = generateToken(res);

@@ -12,18 +12,20 @@
     "url": "git+https://github.com/maghin0/which-stack.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "maghin",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/maghin0/which-stack/issues"
   },
   "homepage": "https://github.com/maghin0/which-stack#readme",
   "dependencies": {
-    "apollo-server": "^2.8.1",
+    "apollo-server": "^2.5.0",
     "bcryptjs": "^2.4.3",
-    "graphql": "^14.4.2",
+    "graphql": "^14.3.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.6.9",
+    "mongoose": "^5.5.11"
+  },
+  "devDependencies": {
     "nodemon": "^1.19.1"
   }
 }

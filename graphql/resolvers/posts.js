@@ -1,7 +1,7 @@
 const { AuthenticationError, UserInputError } = require("apollo-server");
 
 const Post = require("../../models/Post");
-const checkAuth = require("../../utilities/check-auth");
+const checkAuth = require("../../util/check-auth");
 
 module.exports = {
   Query: {
@@ -29,13 +29,18 @@ module.exports = {
   Mutation: {
     async createPost(_, { body }, context) {
       const user = checkAuth(context);
-      console.log(user);
+
+      if (body.trim() === "") {
+        throw new Error("Post body must not be empty");
+      }
+
       const newPost = new Post({
         body,
-        user: user.indexOf,
+        user: user.id,
         username: user.username,
         createdAt: new Date().toISOString()
       });
+
       const post = await newPost.save();
 
       context.pubsub.publish("NEW_POST", {
@@ -49,12 +54,11 @@ module.exports = {
 
       try {
         const post = await Post.findById(postId);
-
         if (user.username === post.username) {
           await post.delete();
-          return "post deleted";
+          return "Post deleted successfully";
         } else {
-          throw new AuthenticationError("not creator of the post");
+          throw new AuthenticationError("Action not allowed");
         }
       } catch (err) {
         throw new Error(err);
